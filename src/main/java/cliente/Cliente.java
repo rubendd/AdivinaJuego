@@ -107,7 +107,7 @@ public final class Cliente {
 
     private boolean juegoTerminado() throws IOException {
         String respuestaServidor = reader.readLine();
-        return respuestaServidor.contains("premios ya han sido encontrados");
+        return respuestaServidor.contains("Juego terminado. Todos los premios han sido encontrados.");
     }
 
     private void cerrarRecursos() {
