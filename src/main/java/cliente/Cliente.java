@@ -21,17 +21,17 @@ import java.util.logging.Logger;
  */
 public final class Cliente {
 
+    private static final List<ClienteListener> clienteListeners = new ArrayList<>();
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 4444;
-
-    private static final List<ClienteListener> clienteListeners = new ArrayList<>();
 
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
     private BufferedReader userInput;
     private int clienteId;
-    private int jugadas = 3;
+    private int jugadas = 4;
+    private int premios;
 
     public static void addListener(ClienteListener listener) {
         clienteListeners.add(listener);
@@ -47,14 +47,25 @@ public final class Cliente {
     }
 
     private void mandarMensajeServidor() {
-
         try {
             String mensaje = reader.readLine();
             clienteListeners.forEach(l -> l.enviarMensajeServidor(mensaje));
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
 
+    private void mandarJugadas() {
+        clienteListeners.forEach(l -> l.enviarNumeroJuagdas(jugadas));
+    }
+    
+    private void mandarPremios(){
+        try {
+            premios = Integer.parseInt(reader.readLine());
+            clienteListeners.forEach(l -> l.enviarNumeroPremios(premios));
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public void mandarIntentoServer(int fila, int columna) {
@@ -62,6 +73,7 @@ public final class Cliente {
             writer.println(fila);
             writer.println(columna);
             jugadas--;
+            mandarJugadas();
         }
     }
 
@@ -78,9 +90,11 @@ public final class Cliente {
 
     public void jugar() {
         try {
-            mandarId();
+            mandarId(); // Al iniciar la pantalla mandamos la id proporcionada por el server.
+            mandarJugadas(); // Al iniciar la pantalla cliente mandamos el numero de jugadas.            
             while (true) {
                 mandarMensajeServidor();
+                mandarPremios();
                 if (juegoTerminado()) {
                     break;
                 }
@@ -95,10 +109,9 @@ public final class Cliente {
 
     private boolean juegoTerminado() throws IOException {
         String respuestaServidor = reader.readLine();
-
         return respuestaServidor.contains("premios ya han sido encontrados");
     }
-
+    
     private void cerrarRecursos() {
         try {
             socket.close();

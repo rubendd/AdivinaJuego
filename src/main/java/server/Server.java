@@ -22,9 +22,9 @@ public class Server {
     private static final int FILAS = 3;
     private static final int COLUMNAS = 4;
     private static final int NUMERO_PREMIOS = 4;
-    private static int idCliente = 0;    
+    private static int idCliente = 0;
     private static boolean[][] tablero;
-    private static List<ServidorListener> listeners = new ArrayList<>();
+    private static final List<ServidorListener> listeners = new ArrayList<>();
 
     public static void addListener(ServidorListener listener) {
         listeners.add(listener);
@@ -40,7 +40,13 @@ public class Server {
         listeners.forEach(z -> z.actualizarTablero(tablero));
     }
 
-    public static void initServer() {
+    public static void premioEncontrado(int fila, int columna) {
+        tablero[fila][columna] = false;
+        notificarMensaje("Premio encontrado en fila " + "[" + fila + "]" + ", columna " + "[" + columna + "]");
+        actualizarTablero(tablero);
+    }
+
+    public void initServer() {
         inicializarTablero();
         actualizarTablero(tablero);
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
@@ -49,8 +55,8 @@ public class Server {
             while (true) {
                 Socket clienteSocket = serverSocket.accept();
                 idCliente++;
-                notificarMensaje("Servidor: Cliente conectado desde " + clienteSocket.getInetAddress().getHostAddress() + 
-                        " con id: "+idCliente);
+                notificarMensaje("Servidor: Cliente conectado desde " + clienteSocket.getInetAddress().getHostAddress()
+                        + " con id: " + idCliente);
 
                 if (tableroCompleto()) {
                     notificarMensaje("Servidor: Todos los premios ya han sido encontrados. Cliente desconectado.");
@@ -70,17 +76,25 @@ public class Server {
     private static void inicializarTablero() {
         tablero = new boolean[FILAS][COLUMNAS];
         Random random = new Random();
+        int premiosColocados = 0;
 
-        // Coloca aleatoriamente los premios en el tablero
-        for (int i = 0; i < NUMERO_PREMIOS; i++) {
+        while (premiosColocados < NUMERO_PREMIOS) {
             int fila = random.nextInt(FILAS);
             int columna = random.nextInt(COLUMNAS);
-            tablero[fila][columna] = true;
+
+            if (!tablero[fila][columna]) {
+                tablero[fila][columna] = true;
+                premiosColocados++;
+            }
         }
     }
-
+    
+    /**
+     * Método estático que retorna si el tablero todavía tiene premios por
+     * econtrar.
+     * @return false si hay premios sin encontrar.
+     */
     private static boolean tableroCompleto() {
-        // Verifica si todos los premios han sido encontrados
         for (boolean[] fila : tablero) {
             for (boolean premio : fila) {
                 if (premio) {
@@ -91,9 +105,9 @@ public class Server {
         return true; // Todos los premios han sido encontrados
     }
 
-    private static void manejarCliente(Socket clienteSocket) {
+    private void manejarCliente(Socket clienteSocket) {
         try {
-            ServerWorker clienteHandler = new ServerWorker(clienteSocket, tablero,idCliente);
+            ServerWorker clienteHandler = new ServerWorker(clienteSocket, tablero, idCliente);
             clienteHandler.start();
         } catch (IOException e) {
             e.printStackTrace();

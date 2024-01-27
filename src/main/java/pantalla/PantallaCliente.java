@@ -8,6 +8,7 @@ package pantalla;
 import cliente.Cliente;
 import cliente.ClienteListener;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
 /**
@@ -25,16 +26,23 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     }
 
     @Override
-    public void enviarNumeroJuagdas(int jugadas) {
-        if (jugadas == 0) {
-            JOptionPane.showConfirmDialog(rootPane, "Jugadas acabadas lo siento");
+    public void enviarNumeroJuagdas(int numeroJugadas) {
+        if (numeroJugadas == 0) {
+            JOptionPane.showMessageDialog(rootPane, "Jugadas acabadas, fin del juego");
             System.exit(0);
+        } else {
+            jugadas.setText(String.valueOf(numeroJugadas));
         }
     }
 
     @Override
     public void enviarMensajeServidor(String mensaje) {
         jTextArea1.append("\n" + mensaje);
+    }
+    
+    @Override
+    public void enviarNumeroPremios(int numeroPremios) {
+        premios.setText(String.valueOf(numeroPremios));
     }
 
     /**
@@ -50,7 +58,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     /**
      * Ejecuta el servidor en otro hilo para no estancar su bucle infinito. Se
      * usa SwingWorker ya que genera perfectamente otro hilo para ejecutar el
-     * servidor.
+     * bucle de jugar cliente.
      */
     private void ejecutarClienteEnSegundoPlano() {
         SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
@@ -58,7 +66,8 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
             protected Void doInBackground() throws Exception {
                 juego();
                 return null;
-            };
+            }
+        ;
         };
         worker.execute();
     }
@@ -110,7 +119,11 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
 
         jLabel4.setText("Jugadas: ");
 
+        jugadas.setText("0");
+
         jLabel5.setText("Premios:");
+
+        premios.setText("0");
 
         jTextArea1.setColumns(20);
         jTextArea1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
@@ -182,15 +195,15 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
                     .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addComponent(salir)
-                        .addGap(64, 64, 64)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(57, 57, 57)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jugadas, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(64, 64, 64)
-                        .addComponent(premios, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jugadas, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(216, 216, 216)
-                        .addComponent(jLabel5))
+                        .addGap(205, 205, 205)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel5)
+                            .addComponent(premios, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(116, 116, 116)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -201,9 +214,31 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     }// </editor-fold>//GEN-END:initComponents
 
     private void eviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eviarActionPerformed
-        // TODO add your handling code here:
-        cliente.mandarIntentoServer(Integer.parseInt(fila.getText()), Integer.parseInt(columna.getText()));
+        // TODO add your handling code here:      
+        if (comprobarTextfield(fila,3) && comprobarTextfield(columna, 4)) {
+            cliente.mandarIntentoServer(Integer.parseInt(fila.getText()), Integer.parseInt(columna.getText()));
+        } else {
+            JOptionPane.showMessageDialog(this, "Solo puedes insertar en la fila un numero menor o igual que 3 y mayor o igual que 1"
+                    + " y para la columna un numero menor o igual a 4 y mayor o igual a 1");
+        }
     }//GEN-LAST:event_eviarActionPerformed
+
+    private boolean comprobarTextfield(JTextField textField, int limite) {
+        if (textField.getText().isBlank() || !isNumber(textField.getText())) {
+            return false;
+        }
+        // Cambié la condición a menor o igual a 3 para que cumpla con el mensaje de error.
+        return !(Integer.parseInt(textField.getText()) > limite && Integer.parseInt(textField.getText()) < 1);
+    }
+
+    private boolean isNumber(String text) {
+        for (char c : text.toCharArray()) {
+            if (!Character.isDigit(c)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * @param args the command line arguments
@@ -256,5 +291,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     private javax.swing.JLabel premios;
     private javax.swing.JButton salir;
     // End of variables declaration//GEN-END:variables
+
+    
 
 }

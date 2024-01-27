@@ -89,7 +89,8 @@ public class PantallaServidor extends javax.swing.JFrame implements ServidorList
     }
 
     private void initServer() {
-        Server.initServer();
+        Server server = new Server();
+        server.initServer();
     }
 
     /**
