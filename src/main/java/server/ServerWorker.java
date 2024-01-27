@@ -22,9 +22,7 @@ public class ServerWorker extends Thread {
     private final PrintWriter salida;
     private final boolean[][] tablero;
     private final int id;
-    private static int jugadas = 3;
-    
-      
+
     public ServerWorker(Socket clienteSocket, boolean[][] tablero, int id) throws IOException {
         this.clienteSocket = clienteSocket;
         this.entrada = new BufferedReader(new InputStreamReader(clienteSocket.getInputStream()));
@@ -35,30 +33,29 @@ public class ServerWorker extends Thread {
 
     @Override
     public void run() {
-        try {            
+        try {
+            salida.println(id);
             while (true) {
                 // Espera la entrada del cliente (fila y columna)
-                salida.println(id);
-                salida.println(jugadas);
-                Server.notificarMensaje("soy el cliente "+id);
                 int fila = Integer.parseInt(entrada.readLine());
                 int columna = Integer.parseInt(entrada.readLine());
-
                 // Verifica si hay un premio en la posición indicada
                 boolean premioEncontrado = tablero[fila][columna];
                 if (premioEncontrado) {
-                    Server.notificarMensaje("Premio encontrado en fila " + fila + ", columna " + columna);
+                    Server.notificarMensaje("Premio encontrado en fila " + "[" + fila + "]" + ", columna " + "[" + columna + "]" + " Cliente: " + id);
                     salida.println("¡Felicidades! Has encontrado un premio.");
                 } else {
-                   Server.notificarMensaje("No hay premio en fila " + fila + ", columna " + columna);
-                    salida.println("Lo siento, no hay premio en esa posición.");
+                    Server.notificarMensaje("No hay premio en fila " + fila + ", columna " + columna);
+                    salida.println("NoPremio " + fila + " " + columna);
                 }
 
                 // Informa al cliente si el juego ha terminado
                 if (tableroCompleto()) {
                     Server.notificarMensaje("Todos los premios han sido encontrados. El juego ha terminado.");
-                    salida.println("Fin del juego. Todos los premios han sido encontrados.");
+                     salida.println("Juego terminado. Todos los premios han sido encontrados.");
                     break;
+                } else {
+                    salida.println();
                 }
             }
         } catch (IOException e) {

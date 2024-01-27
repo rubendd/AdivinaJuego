@@ -24,7 +24,7 @@ public final class Cliente {
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 4444;
 
-    private static List<ClienteListener> clienteListeners = new ArrayList<>();
+    private static final List<ClienteListener> clienteListeners = new ArrayList<>();
 
     private Socket socket;
     private BufferedReader reader;
@@ -37,7 +37,7 @@ public final class Cliente {
         clienteListeners.add(listener);
     }
 
-    public void mandarId() {
+    private void mandarId() {
         try {
             clienteId = Integer.parseInt(reader.readLine());
             clienteListeners.forEach(l -> l.enviarId(clienteId));
@@ -46,13 +46,23 @@ public final class Cliente {
         }
     }
 
-    public void mandarNumeroJugadas() {
+    private void mandarMensajeServidor() {
+
+        try {
+            String mensaje = reader.readLine();
+            clienteListeners.forEach(l -> l.enviarMensajeServidor(mensaje));
+        } catch (IOException ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
-    public void mandarIntentoServer() {
-        
-        jugadas--;        
+    public void mandarIntentoServer(int fila, int columna) {
+        if (jugadas > 0) {
+            writer.println(fila);
+            writer.println(columna);
+            jugadas--;
+        }
     }
 
     public Cliente() {
@@ -70,17 +80,10 @@ public final class Cliente {
         try {
             mandarId();
             while (true) {
+                mandarMensajeServidor();
                 if (juegoTerminado()) {
                     break;
                 }
-
-                int fila = obtenerEntradaUsuario("Ingrese la fila (0-2): ");
-                int columna = obtenerEntradaUsuario("Ingrese la columna (0-3): ");
-
-                enviarMovimientoAlServidor(fila, columna);
-
-                // Receive and print the server's response
-                System.out.println(reader.readLine());
             }
 
         } catch (IOException e) {
@@ -92,18 +95,8 @@ public final class Cliente {
 
     private boolean juegoTerminado() throws IOException {
         String respuestaServidor = reader.readLine();
-        System.out.println(respuestaServidor);
 
         return respuestaServidor.contains("premios ya han sido encontrados");
-    }
-
-    private int obtenerEntradaUsuario(String mensaje) throws IOException {
-        System.out.print(mensaje);
-        return Integer.parseInt(userInput.readLine());
-    }
-
-    private void enviarMovimientoAlServidor(int fila, int columna) {
-        writer.println(fila + "," + columna);
     }
 
     private void cerrarRecursos() {

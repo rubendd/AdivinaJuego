@@ -16,21 +16,25 @@ import javax.swing.SwingWorker;
  * @author Dugo
  */
 public class PantallaCliente extends javax.swing.JFrame implements ClienteListener {
-    
-    private Cliente cliente;
-    
+
+    private final Cliente cliente;
+
     @Override
     public void enviarId(int id) {
         idcliente.setText(String.valueOf(id));
     }
-    
+
     @Override
     public void enviarNumeroJuagdas(int jugadas) {
         if (jugadas == 0) {
             JOptionPane.showConfirmDialog(rootPane, "Jugadas acabadas lo siento");
             System.exit(0);
         }
-        
+    }
+
+    @Override
+    public void enviarMensajeServidor(String mensaje) {
+        jTextArea1.append("\n" + mensaje);
     }
 
     /**
@@ -58,7 +62,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
         };
         worker.execute();
     }
-    
+
     private void juego() {
         cliente.jugar();
     }
@@ -198,7 +202,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
 
     private void eviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eviarActionPerformed
         // TODO add your handling code here:
-        
+        cliente.mandarIntentoServer(Integer.parseInt(fila.getText()), Integer.parseInt(columna.getText()));
     }//GEN-LAST:event_eviarActionPerformed
 
     /**

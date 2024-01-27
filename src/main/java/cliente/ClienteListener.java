@@ -12,4 +12,5 @@ package cliente;
 public interface ClienteListener {
     void enviarId(int id);
     void enviarNumeroJuagdas(int jugadas);
+    void enviarMensajeServidor(String mensaje);
 }
