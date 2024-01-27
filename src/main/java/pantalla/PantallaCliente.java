@@ -39,7 +39,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     public void enviarMensajeServidor(String mensaje) {
         jTextArea1.append("\n" + mensaje);
     }
-    
+
     @Override
     public void enviarNumeroPremios(int numeroPremios) {
         premios.setText(String.valueOf(numeroPremios));
@@ -57,7 +57,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
 
     /**
      * Ejecuta el servidor en otro hilo para no estancar su bucle infinito. Se
-     * usa SwingWorker ya que genera perfectamente otro hilo para ejecutar el
+     * usa la clase SwingWorker ya que genera perfectamente otro hilo para ejecutar el
      * bucle de jugar cliente.
      */
     private void ejecutarClienteEnSegundoPlano() {
@@ -66,8 +66,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
             protected Void doInBackground() throws Exception {
                 juego();
                 return null;
-            }
-        ;
+            };
         };
         worker.execute();
     }
@@ -215,7 +214,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
 
     private void eviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eviarActionPerformed
         // TODO add your handling code here:      
-        if (comprobarTextfield(fila,3) && comprobarTextfield(columna, 4)) {
+        if (comprobarTextfield(fila, 3) && comprobarTextfield(columna, 4)) {
             cliente.mandarIntentoServer(Integer.parseInt(fila.getText()), Integer.parseInt(columna.getText()));
         } else {
             JOptionPane.showMessageDialog(this, "Solo puedes insertar en la fila un numero menor o igual que 3 y mayor o igual que 1"
@@ -227,8 +226,7 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
         if (textField.getText().isBlank() || !isNumber(textField.getText())) {
             return false;
         }
-        // Cambié la condición a menor o igual a 3 para que cumpla con el mensaje de error.
-        return !(Integer.parseInt(textField.getText()) > limite && Integer.parseInt(textField.getText()) < 1);
+        return (Integer.parseInt(textField.getText()) <= limite && Integer.parseInt(textField.getText()) >= 1);
     }
 
     private boolean isNumber(String text) {
@@ -291,7 +289,5 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
     private javax.swing.JLabel premios;
     private javax.swing.JButton salir;
     // End of variables declaration//GEN-END:variables
-
-    
 
 }

@@ -58,8 +58,8 @@ public final class Cliente {
     private void mandarJugadas() {
         clienteListeners.forEach(l -> l.enviarNumeroJuagdas(jugadas));
     }
-    
-    private void mandarPremios(){
+
+    private void mandarPremios() {
         try {
             premios = Integer.parseInt(reader.readLine());
             clienteListeners.forEach(l -> l.enviarNumeroPremios(premios));
@@ -69,12 +69,10 @@ public final class Cliente {
     }
 
     public void mandarIntentoServer(int fila, int columna) {
-        if (jugadas > 0) {
-            writer.println(fila);
-            writer.println(columna);
-            jugadas--;
-            mandarJugadas();
-        }
+        writer.println(fila);
+        writer.println(columna);
+        jugadas--;
+        mandarJugadas();
     }
 
     public Cliente() {
@@ -111,7 +109,7 @@ public final class Cliente {
         String respuestaServidor = reader.readLine();
         return respuestaServidor.contains("premios ya han sido encontrados");
     }
-    
+
     private void cerrarRecursos() {
         try {
             socket.close();

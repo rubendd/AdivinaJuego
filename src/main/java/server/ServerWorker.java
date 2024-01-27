@@ -24,8 +24,6 @@ public class ServerWorker extends Thread {
     private final int id;
     private int numeroPremios = 0;
 
-    
-
     public ServerWorker(Socket clienteSocket, boolean[][] tablero, int id) throws IOException {
         this.clienteSocket = clienteSocket;
         this.entrada = new BufferedReader(new InputStreamReader(clienteSocket.getInputStream()));
@@ -56,7 +54,10 @@ public class ServerWorker extends Thread {
                     salida.println(numeroPremios);
                 } else {
                     Server.notificarMensaje("No hay premio en fila " + fila + ", columna " + columna);
-                    salida.println("["+fila+"]" + " " + "["+columna+"]");
+                    fila++;
+                    columna++;
+                    salida.println("[" + fila + "]" + " " + "[" + columna + "]" + " Sin premio");
+                    salida.println(numeroPremios);
                 }
                 // Juego termina
                 if (tableroCompleto()) {
@@ -90,8 +91,8 @@ public class ServerWorker extends Thread {
         }
         return true; // Todos los premios han sido encontrados
     }
-    
-     private void premioEncontrado(int fila, int columna) {
+
+    private void premioEncontrado(int fila, int columna) {
         Server.premioEncontrado(fila, columna);
     }
 
