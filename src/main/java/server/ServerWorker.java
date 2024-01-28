@@ -20,11 +20,11 @@ public class ServerWorker extends Thread {
     private final Socket clienteSocket;
     private final BufferedReader entrada;
     private final PrintWriter salida;
-    private final boolean[][] tablero;
+    private final String[][] tablero;
     private final int id;
     private int numeroPremios = 0;
 
-    public ServerWorker(Socket clienteSocket, boolean[][] tablero, int id) throws IOException {
+    public ServerWorker(Socket clienteSocket, String[][] tablero, int id) throws IOException {
         this.clienteSocket = clienteSocket;
         this.entrada = new BufferedReader(new InputStreamReader(clienteSocket.getInputStream()));
         this.salida = new PrintWriter(clienteSocket.getOutputStream(), true);
@@ -37,63 +37,58 @@ public class ServerWorker extends Thread {
         try {
             Server.notificarMensaje("Cliente conectado => " + id);
             salida.println(id);
-            while (true) {
-                int fila = Integer.parseInt(entrada.readLine());
-                int columna = Integer.parseInt(entrada.readLine());
-                fila--; // Ajustamos la entrada de la fila.
-                columna--; // Ajustamos la entrada de la columna.
-                boolean premioEncontrado = tablero[fila][columna];
-                // Server.notificarMensaje(Arrays.deepToString(tablero)); // Para debugear
-                // Server.notificarMensaje(String.valueOf(premioEncontrado)); // Para debugear
-                if (premioEncontrado) {
-                    numeroPremios++;
-                    Server.notificarMensaje("Premio encontrado en fila " + "[" + fila + "]" + ", columna " + "[" + columna + "]" + " Cliente: " + id);
-                    premioEncontrado(fila, columna);
-                    Server.actualizarTablero(Server.getTablero());
-                    salida.println("¡Felicidades! Has encontrado un premio.");
-                    salida.println(numeroPremios);
+            while (!tableroCompleto()) {
+                int fila = Integer.parseInt(entrada.readLine()) - 1;
+                int columna = Integer.parseInt(entrada.readLine()) - 1;
+
+                String premioEncontrado = tablero[fila][columna];
+
+                if (!premioEncontrado.equals("SIN PREMIO")) {
+                    realizarPremioEncontrado(fila, columna, premioEncontrado);
                 } else {
-                    Server.notificarMensaje("No hay premio en fila " + fila + ", columna " + columna);
-                    fila++;
-                    columna++;
-                    salida.println("[" + fila + "]" + " " + "[" + columna + "]" + " Sin premio");
-                    salida.println(numeroPremios);
-                }
-                // Juego termina
-                if (tableroCompleto()) {
-                    Server.notificarMensaje("Todos los premios han sido encontrados. El juego ha terminado.");
-                    salida.println("Juego terminado. Todos los premios han sido encontrados.");
-                    break;
-                } else {
-                    salida.println();
+                    realizarSinPremio(fila, columna);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            try {
-                Server.notificarMensaje("Cliente cerrado => " + id);
-                clienteSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            cerrarClienteSocket();
         }
     }
 
+    private void realizarPremioEncontrado(int fila, int columna, String premioEncontrado) {
+        numeroPremios++;
+        Server.notificarMensaje("Cliente "+id + " =>"+" Premio encontrado en fila " + "[" + fila + "]" + ", columna " + "[" + columna + "]");
+        premioEncontrado(fila, columna);
+        Server.actualizarTablero(Server.getTablero());
+        salida.println("[" + fila + "]" + " " + "[" + columna + "]" + "Has encontrado " + premioEncontrado);
+        salida.println(numeroPremios);
+    }
+
+    private void realizarSinPremio(int fila, int columna) {
+        Server.notificarMensaje("Cliente "+id + " =>"+ " No hay premio en fila " + fila + ", columna " + columna);
+        fila++;
+        columna++;
+        salida.println("[" + fila + "]" + " " + "[" + columna + "]" + " Sin premio");
+        salida.println(numeroPremios);
+    }
+
     private boolean tableroCompleto() {
-        // Verifica si todos los premios han sido encontrados
-        for (boolean[] fila : tablero) {
-            for (boolean premio : fila) {
-                if (premio) {
-                    return false; // Todavía hay premios sin encontrar
-                }
-            }
-        }
-        return true; // Todos los premios han sido encontrados
+        return Server.tableroCompleto();
     }
 
     private void premioEncontrado(int fila, int columna) {
         Server.premioEncontrado(fila, columna);
+    }
+
+    private void cerrarClienteSocket() {
+        try {
+            try (clienteSocket) {
+                Server.notificarMensaje("Cliente cerrado => " + id);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

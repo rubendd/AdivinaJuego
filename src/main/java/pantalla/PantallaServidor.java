@@ -14,6 +14,7 @@ import server.ServidorListener;
 /**
  * Esta clase es la pantalla que va a ir mostrando el funcionamiento del
  * servidor.
+ *
  * @author Dugo
  */
 public class PantallaServidor extends javax.swing.JFrame implements ServidorListener {
@@ -26,10 +27,10 @@ public class PantallaServidor extends javax.swing.JFrame implements ServidorList
     }
 
     @Override
-    public void actualizarTablero(boolean[][] tablero) {
+    public void actualizarTablero(String[][] tablero) {
         for (int i = 0; i < tablero.length; i++) {
             for (int j = 0; j < tablero[i].length; j++) {
-                modeloTabla.setValueAt(tablero[i][j] ? "PREMIO" : " ", i, j);
+                modeloTabla.setValueAt(tablero[i][j], i, j);
             }
         }
     }
@@ -45,32 +46,7 @@ public class PantallaServidor extends javax.swing.JFrame implements ServidorList
         ejecutarServerEnSegundoPlano();
     }
 
-    private void iniciarTablero() {
-        // Limpiar el modelo de la tabla antes de iniciar
-        modeloTabla.setRowCount(0);
-        modeloTabla.setColumnCount(0);
-
-        // Configurar las columnas en el modelo de la tabla con un ancho preferido
-        for (int i = 0; i < Server.getCOLUMNAS(); i++) {
-            modeloTabla.addColumn("");
-            jTable1.getColumnModel().getColumn(i).setPreferredWidth(50);  // Establecer el ancho deseado en píxeles
-        }
-
-        // Configurar las filas en el modelo de la tabla
-        for (int i = 0; i < Server.getFILAS(); i++) {
-            modeloTabla.addRow(new Object[Server.getCOLUMNAS()]);
-        }
-
-        // Colocar premios en la tabla según el estado del tablero
-        for (int i = 0; i < Server.getFILAS(); i++) {
-            for (int j = 0; j < Server.getCOLUMNAS(); j++) {
-                if (Server.getTablero()[i][j]) {
-                    modeloTabla.setValueAt("PREMIO", i, j);
-                }
-            }
-        }
-    }
-
+   
     /**
      * Ejecuta el servidor en otro hilo para no estancar su bucle infinito. Se
      * usa SwingWorker ya que genera perfectamente otro hilo para ejecutar el

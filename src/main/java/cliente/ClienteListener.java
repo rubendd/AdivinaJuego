@@ -14,4 +14,6 @@ public interface ClienteListener {
     void enviarNumeroJuagdas(int jugadas);
     void enviarMensajeServidor(String mensaje);
     void enviarNumeroPremios(int premios);
+    void finalizarPartida();
+    void enviarErrorConexion();
 }

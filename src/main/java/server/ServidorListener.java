@@ -13,5 +13,5 @@ public interface ServidorListener {
 
     void imprimirMensaje(String mensaje);
     
-    void actualizarTablero(boolean[][] tablero);
+    void actualizarTablero(String[][] tablero);
 }

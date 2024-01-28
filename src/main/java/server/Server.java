@@ -21,10 +21,12 @@ public class Server {
     private static final int PORT = 4444;
     private static final int FILAS = 3;
     private static final int COLUMNAS = 4;
-    private static final int NUMERO_PREMIOS = 4;
+    private static final int NUMERO_PREMIOS = 4; // Número total de premios
     private static int idCliente = 0;
-    private static boolean[][] tablero;
+    private static String[][] tablero; // Cambiado a String
     private static final List<ServidorListener> listeners = new ArrayList<>();
+
+    private static final String[] PREMIOS = {"CRUCERO", "ENTRADAS", "CONCIERTO", "CONSOLA"};
 
     public static void addListener(ServidorListener listener) {
         listeners.add(listener);
@@ -36,13 +38,12 @@ public class Server {
         });
     }
 
-    public static void actualizarTablero(boolean[][] tablero) {
+    public static void actualizarTablero(String[][] tablero) {
         listeners.forEach(z -> z.actualizarTablero(tablero));
     }
 
     public static void premioEncontrado(int fila, int columna) {
-        tablero[fila][columna] = false;
-        notificarMensaje("Premio encontrado en fila " + "[" + fila + "]" + ", columna " + "[" + columna + "]");
+        tablero[fila][columna] = "SIN PREMIO"; // Eliminar el premio encontrado
         actualizarTablero(tablero);
     }
 
@@ -59,9 +60,7 @@ public class Server {
                         + " con id: " + idCliente);
 
                 if (tableroCompleto()) {
-                    notificarMensaje("Servidor: Todos los premios ya han sido encontrados. Cliente desconectado.");
-                    clienteSocket.close();
-                    continue;
+                    notificarMensaje("Servidor: Todos los premios ya han sido encontrados.");
                 }
 
                 // Inicia un nuevo hilo para manejar la conexión con el cliente
@@ -74,7 +73,13 @@ public class Server {
     }
 
     private static void inicializarTablero() {
-        tablero = new boolean[FILAS][COLUMNAS];
+        tablero = new String[FILAS][COLUMNAS];
+        for (int i = 0; i < FILAS; i++) {
+            for (int j = 0; j < COLUMNAS; j++) {
+                tablero[i][j] = "SIN PREMIO"; // Inicializar todas las celdas sin premios
+            }
+        }
+
         Random random = new Random();
         int premiosColocados = 0;
 
@@ -82,22 +87,17 @@ public class Server {
             int fila = random.nextInt(FILAS);
             int columna = random.nextInt(COLUMNAS);
 
-            if (!tablero[fila][columna]) {
-                tablero[fila][columna] = true;
+            if (tablero[fila][columna].equals("SIN PREMIO")) {
+                tablero[fila][columna] = PREMIOS[premiosColocados];
                 premiosColocados++;
             }
         }
     }
-    
-    /**
-     * Método estático que retorna si el tablero todavía tiene premios por
-     * econtrar.
-     * @return false si hay premios sin encontrar.
-     */
-    private static boolean tableroCompleto() {
-        for (boolean[] fila : tablero) {
-            for (boolean premio : fila) {
-                if (premio) {
+
+    public synchronized static boolean tableroCompleto() {
+        for (String[] fila : tablero) {
+            for (String premio : fila) {
+                if (!premio.equals("SIN PREMIO")) {
                     return false; // Todavía hay premios sin encontrar
                 }
             }
@@ -122,7 +122,7 @@ public class Server {
         return COLUMNAS;
     }
 
-    public static boolean[][] getTablero() {
+    public static String[][] getTablero() {
         return tablero;
     }
 

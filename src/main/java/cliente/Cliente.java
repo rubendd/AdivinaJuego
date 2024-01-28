@@ -46,17 +46,19 @@ public final class Cliente {
         }
     }
 
-    private void mandarMensajeServidor() {
+    private void mandarJugadas() {
+        clienteListeners.forEach(l -> l.enviarNumeroJuagdas(jugadas));
+    }
+
+    private void mandarMensajeServidor() throws IOException {
         try {
             String mensaje = reader.readLine();
-            clienteListeners.forEach(l -> l.enviarMensajeServidor(mensaje));
+            if (!mensaje.equals("null")) {
+                clienteListeners.forEach(l -> l.enviarMensajeServidor(mensaje));
+            }
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
-    private void mandarJugadas() {
-        clienteListeners.forEach(l -> l.enviarNumeroJuagdas(jugadas));
     }
 
     private void mandarPremios() {
@@ -66,6 +68,10 @@ public final class Cliente {
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void mandarTerminarPartida() {
+        clienteListeners.forEach(l -> l.finalizarPartida());
     }
 
     public void mandarIntentoServer(int fila, int columna) {
@@ -87,27 +93,30 @@ public final class Cliente {
     }
 
     public void jugar() {
-        try {
-            mandarId(); // Al iniciar la pantalla mandamos la id proporcionada por el server.
-            mandarJugadas(); // Al iniciar la pantalla cliente mandamos el numero de jugadas.            
-            while (true) {
-                mandarMensajeServidor();
-                mandarPremios();
-                if (juegoTerminado()) {
-                    break;
+        if (!errorDeConexion()) { // Si no hay error de conexión.
+            try {
+                mandarId(); // Al iniciar la pantalla mandamos la id proporcionada por el server.
+                mandarJugadas(); // Al iniciar la pantalla cliente mandamos el numero de jugadas.            
+                while (true) {
+                    mandarMensajeServidor();
+                    mandarPremios();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                mandarTerminarPartida();
+                cerrarRecursos();
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            cerrarRecursos();
         }
     }
 
-    private boolean juegoTerminado() throws IOException {
-        String respuestaServidor = reader.readLine();
-        return respuestaServidor.contains("Juego terminado. Todos los premios han sido encontrados.");
+    private boolean errorDeConexion() {
+        if (socket == null) {
+            clienteListeners.forEach(l -> l.enviarErrorConexion());
+            return true;
+        }
+        return false;
+
     }
 
     private void cerrarRecursos() {
