@@ -10,11 +10,20 @@ import pantalla.PantallaCliente;
 import pantalla.PantallaServidor;
 
 /**
+ * La clase Main es la clase principal del programa que inicia la aplicación.
+ * Proporciona métodos para inicializar y mostrar la interfaz gráfica de usuario,
+ * así como para tomar decisiones basadas en la elección del usuario al cerrar la ventana inicial.
  *
  * @author Dugo
  */
 public class Main {
 
+    /**
+     * Método principal que inicia la aplicación. Crea y muestra la ventana de inicio,
+     * espera hasta que se cierre la ventana y realiza acciones basadas en la elección del usuario.
+     *
+     * @param args Argumentos de la línea de comandos (no utilizados en este caso).
+     */
     public static void main(String[] args) {
         Init init = new Init();
         init.setLocationRelativeTo(null);
@@ -43,6 +52,9 @@ public class Main {
         }
     }
 
+    /**
+     * Inicializa y muestra la interfaz gráfica del servidor.
+     */
     private static void initServer() {
         // Lógica de inicialización del servidor
         PantallaServidor pantallaServidor = new PantallaServidor();
@@ -50,12 +62,14 @@ public class Main {
         pantallaServidor.setVisible(true);
     }
 
+    /**
+     * Inicializa y muestra la interfaz gráfica del cliente.
+     */
     private static void initCliente() {
         // Lógica de inicialización del cliente
         PantallaCliente pantallaCliente = new PantallaCliente();
         pantallaCliente.setLocationRelativeTo(null);
         pantallaCliente.setVisible(true);
-
     }
-
 }
+
