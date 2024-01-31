@@ -5,11 +5,10 @@
  */
 package pantalla;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+
 
 /**
- *
+ * Clase que inicia la opción de elegir entre servidor y cliente.
  * @author Dugo
  */
 public class Init extends javax.swing.JFrame {

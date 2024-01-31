@@ -19,12 +19,20 @@ import javax.swing.SwingWorker;
 public class PantallaCliente extends javax.swing.JFrame implements ClienteListener {
 
     private final Cliente cliente;
-
+    
+    /**
+     * Método que escucha el evento de recibir el id.
+     * @param id número de id.
+     */
     @Override
     public void enviarId(int id) {
         idcliente.setText(String.valueOf(id));
     }
 
+    /**
+     * Método que escucha las jugadas restantes y las coloca en un textfield.
+     * @param numeroJugadas Numero de jugadas restantes.
+     */
     @Override
     public void enviarNumeroJuagdas(int numeroJugadas) {
         if (numeroJugadas == 0) {
@@ -35,23 +43,38 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
             jugadas.setText(String.valueOf(numeroJugadas));
         }
     }
-
+    
+    /**
+     * Método que escucha cuando el servidor recibe un mensaje para colocarlo.
+     * @param mensaje Mensaje recibido.
+     */
     @Override
     public void enviarMensajeServidor(String mensaje) {
         jTextArea1.append("\n" + mensaje);
     }
-
+    
+    /**
+     * Método que escucha el número de premios que ha conseguido el cliente.
+     * @param numeroPremios Numero de premios conseguidos.
+     */
     @Override
     public void enviarNumeroPremios(int numeroPremios) {
         premios.setText(String.valueOf(numeroPremios));
     }
 
+    /**
+     * Método que escucha cuando finaliza la partida. Enviando mostrando un
+     * JOptionPane.
+     */
     @Override
     public void finalizarPartida() {
         JOptionPane.showMessageDialog(this, "Partida finalizada ya no hay mas premios");
         enviar.setEnabled(false);
     }
     
+    /**
+     * Método que envia que hubo un error de conexión.
+     */
     @Override
     public void enviarErrorConexion() {
         JOptionPane.showMessageDialog(this, "No se pudo conectar con el servidor.");
@@ -84,7 +107,10 @@ public class PantallaCliente extends javax.swing.JFrame implements ClienteListen
         };
         worker.execute();
     }
-
+    
+    /**
+     * Ejecuta el juego.
+     */
     private void juego() {
         cliente.jugar();
     }

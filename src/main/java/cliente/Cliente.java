@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -30,7 +31,7 @@ public final class Cliente {
      */
     private static final List<ClienteListener> clienteListeners = new ArrayList<>();
 
-    private static final String SERVER_IP = "192.168.1.139";
+    private static final String SERVER_IP = "localhost";
 
     private static final int SERVER_PORT = 4444;
 
@@ -89,7 +90,7 @@ public final class Cliente {
             }
         } catch (IOException ex) {
             Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        } 
     }
 
     /**

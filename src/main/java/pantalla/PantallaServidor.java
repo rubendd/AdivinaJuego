@@ -13,19 +13,29 @@ import server.ServidorListener;
 
 /**
  * Esta clase es la pantalla que va a ir mostrando el funcionamiento del
- * servidor.
- *
+ * servidor. La pantalla recibe los mensajes que manda el servidor y 
+ * los muestra.
+ * 
  * @author Dugo
  */
 public class PantallaServidor extends javax.swing.JFrame implements ServidorListener {
+    
+    
+    private final DefaultTableModel modeloTabla;
 
-    private DefaultTableModel modeloTabla;
-
+    /**
+     * Método que escucha el evento de imprimir el mensaje que manda el servidor.
+     * @param mensaje Mensaje recibido por parte del servidor.
+     */
     @Override
     public void imprimirMensaje(String mensaje) {
         texto.append("\n" + mensaje);
     }
-
+    
+    /**
+     * Método que escucha el evento de actualizar el tablero.
+     * @param tablero Tablero actualizado por parte del servidor.
+     */
     @Override
     public void actualizarTablero(String[][] tablero) {
         for (int i = 0; i < tablero.length; i++) {
@@ -63,7 +73,10 @@ public class PantallaServidor extends javax.swing.JFrame implements ServidorList
         };
         worker.execute();
     }
-
+    
+    /**
+     * Método que inicia el servidor.
+     */
     private void initServer() {
         Server server = new Server();
         server.initServer();
@@ -167,6 +180,7 @@ public class PantallaServidor extends javax.swing.JFrame implements ServidorList
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 SwingUtilities.invokeLater(() -> new PantallaServidor().setVisible(true));
             }
